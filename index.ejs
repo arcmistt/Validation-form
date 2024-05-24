@@ -1,0 +1,53 @@
+const express = require('express')
+const app = express()
+const port = 3000
+const path= require('path');
+const chat = require('./Models/chat.js');
+
+
+// MongoDB Connection
+const mongoose = require('mongoose');
+main().then(() => console.log('MongoDB Connected...'))  
+.catch(err => console.log(err));
+async function main() {
+  await mongoose.connect('mongodb://127.0.0.1:27017/user');
+}
+// MongoDB Connection end
+
+let chat1 =new chat({
+  from: "Navneet",
+  to: "Bhagat",
+  messagge:"Hello bro!",
+  date_msg: new Date()
+});
+
+chat1.save().then((res) =>{
+  console.log(res)
+});
+
+
+app.get('/chat', (req, res) =>{
+  let chats = await chat.find();
+  console.log(chats);
+  res.render("index.ejs", {chats} )
+});
+
+// Routes
+app.get('/', (req, res) => {
+  res.send('Successfully connected to the server')
+})
+
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
+
+const userSchema = new mongoose.Schema({
+ name: String,  
+  email: String,
+  password: String,
+  phone: Number
+
+})
+const user = mongoose.model('user', userSchema);
